@@ -75,7 +75,7 @@ var findMatches = function (array, value) {
 };
 
 var getRandomKeyForArray = function (arr, length) {
-  var randomKey = Math.round(Math.random() * (length - 1));
+  var randomKey = Math.round(Math.random() * (length));
 
   if (findMatches(arr, randomKey) === true) {
     return getRandomKeyForArray(arr, length);
@@ -86,6 +86,10 @@ var getRandomKeyForArray = function (arr, length) {
 
 var getArrayWithRandomLengthAndValues = function (arr) {
   var arrayLength = getRandomValueInRange(0, arr.length);
+
+  if (arrayLength === arr.length) {
+    return arr;
+  }
 
   if (arrayLength === 0) {
     return [];
