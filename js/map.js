@@ -2,7 +2,18 @@
 
 // начальные данные
 
-var usersID = ['01', '02', '03', '04', '05', '06', '07', '08'];
+
+var usersNumber = 8;
+
+var getUserID = function (numb) {
+  var usersID = [];
+  for (var i = 1; i <= numb; i++) {
+    usersID.push('0' + i);
+  }
+  return usersID;
+};
+
+var usersID = getUserID(usersNumber);
 var usersQuantity = usersID.length;
 var titles = [
   'Большая уютная квартира',
@@ -42,7 +53,14 @@ var usersData = [];
 // вспомогательные функции
 
 var randomSort = function () {
-  return Math.random() - 0.5;
+  var result = Math.random() - 0.5;
+  if (result > 0) {
+    return 1;
+  } else if (result < 0) {
+    return -1;
+  } else {
+    return 0;
+  }
 };
 
 var getRandomValueInRange = function (min, max) {
@@ -64,29 +82,11 @@ var getRandomValueFromArray = function (arr) {
   return arr[randomValue];
 };
 
-var findMatches = function (array, value) {
-  for (var i = 0; i < array.length; i++) {
-    if (array[i] === value) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-var getRandomKeyForArray = function (arr, length) {
-  var randomKey = Math.round(Math.random() * (length));
-
-  if (findMatches(arr, randomKey) === true) {
-    return getRandomKeyForArray(arr, length);
-  }
-
-  return randomKey;
-};
-
 var getArrayWithRandomLengthAndValues = function (arr) {
   var arrayLength = getRandomValueInRange(0, arr.length);
-
+  var arrID = [];
+  var randomKeysForArr = [];
+  var result = [];
   if (arrayLength === arr.length) {
     return arr;
   }
@@ -94,20 +94,19 @@ var getArrayWithRandomLengthAndValues = function (arr) {
   if (arrayLength === 0) {
     return [];
   }
-
-  var result = [];
-  var randomKeysForArr = [];
-
-  for (var i = 1; i <= arrayLength; i++) {
-    randomKeysForArr.push(getRandomKeyForArray(randomKeysForArr, arrayLength));
+  for (var i = 0; i < arr.length; i++) {
+    arrID[i] = i;
   }
 
+  arrID.sort(randomSort);
+  for (i = 0; i < arrayLength; i++) {
+    randomKeysForArr.push(arrID.pop());
+  }
   randomKeysForArr.sort();
 
   for (i = 0; i < randomKeysForArr.length; i++) {
     result.push(arr[randomKeysForArr[i]]);
   }
-
   return result;
 };
 
@@ -188,29 +187,31 @@ var activeUserAvatar = document.querySelector('.dialog__title img');
 var replacedElement = document.querySelector('.dialog__panel');
 var parentElement = document.querySelector('#offer-dialog');
 var fragmentForFeatures = document.createDocumentFragment();
+var activeUserDscr = activeUserInfo.querySelector('.lodge__description');
 var buildingType = {
   'flat': 'Квартира',
   'bungalo': 'Бунгало',
   'house': 'Дом'
 };
 
-activeUserTitle.textContent = usersData[0].offer.title;
-activeUserAddress.textContent = usersData[0].offer.address;
-activeUserPrice.textContent = usersData[0].offer.price + '\u20BD/ночь';
-activeUserType.textContent = buildingType[usersData[0].offer.type];
-activeUserGuests.textContent = 'Для ' + usersData[0].offer.guests + ' гостей в ' + usersData[0].offer.rooms + ' комнатах';
-activeUserCheckin.textContent = 'Заезд после ' + usersData[0].offer.checkin + ', выезд до ' + usersData[0].offer.checkout;
+var setActivePinInfoOnPage = function (data) {
+  activeUserTitle.textContent = data.offer.title;
+  activeUserAddress.textContent = data.offer.address;
+  activeUserPrice.textContent = data.offer.price + ' \u20BD/ночь';
+  activeUserType.textContent = buildingType[data.offer.type];
+  activeUserGuests.textContent = 'Для ' + data.offer.guests + ' гостей в ' + data.offer.rooms + ' комнатах';
+  activeUserCheckin.textContent = 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout;
 
-for (var count = 0; count < usersData[0].offer.features.length; count++) {
-  var feature = document.createElement('span');
-  feature.className = 'feature__image feature__image--' + usersData[0].offer.features[count];
-  fragmentForFeatures.appendChild(feature);
-}
+  for (var count = 0; count < data.offer.features.length; count++) {
+    var feature = document.createElement('span');
+    feature.className = 'feature__image feature__image--' + data.offer.features[count];
+    fragmentForFeatures.appendChild(feature);
+  }
 
-activeUserFeatures.appendChild(fragmentForFeatures);
+  activeUserFeatures.appendChild(fragmentForFeatures);
+  activeUserDscr.textContent = data.offer.description;
+  activeUserAvatar.setAttribute('src', data.author.avatar);
+  parentElement.replaceChild(activeUserInfo, replacedElement);
+};
 
-var activeUserDscr = activeUserInfo.querySelector('.lodge__description');
-activeUserDscr.textContent = usersData[0].offer.description;
-
-activeUserAvatar.setAttribute('src', usersData[0].author.avatar);
-parentElement.replaceChild(activeUserInfo, replacedElement);
+setActivePinInfoOnPage(usersData[0]);
