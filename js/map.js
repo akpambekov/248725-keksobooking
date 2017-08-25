@@ -142,37 +142,34 @@ var getUserData = function () {
   return data;
 };
 
-var fragmentForPins = document.createDocumentFragment();
-var pinMap = document.querySelector('.tokyo__pin-map');
+var drawPins = function () {
+  var fragmentForPins = document.createDocumentFragment();
+  var pinMap = document.querySelector('.tokyo__pin-map');
+  var PIN_HEIGHT = 75;
+  var PIN_HALF_WIDTH = 56 / 2;
 
-/* По этому пункту есть вопрос. В задании сказано, что надо учитывать размеры элемента
-   для того, что бы острый конец указателя был наравлен на задданные координаты, но если я их
-   учитываю, то элементы начинают плавать по небу.
-*/
-var PIN_HEIGHT = 75;
-var PIN_HALF_WIDTH = 56 / 2;
+  for (var i = 0; i < usersQuantity; i++) {
+    usersData.push(getUserData());
 
-// получение данных и отрисовка координат на карте
+    var pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.style.top = usersData[i].location.y - PIN_HEIGHT + 'px';
+    pin.style.left = usersData[i].location.x - PIN_HALF_WIDTH + 'px';
 
-for (var i = 0; i < usersQuantity; i++) {
-  usersData.push(getUserData());
+    var pinImg = document.createElement('img');
+    pinImg.className = 'rounded';
+    pinImg.style.height = '40px';
+    pinImg.style.width = '40px';
+    pinImg.setAttribute('src', usersData[i].author.avatar);
 
-  var pin = document.createElement('div');
-  pin.className = 'pin';
-  pin.style.top = usersData[i].location.y - PIN_HEIGHT + 'px';
-  pin.style.left = usersData[i].location.x - PIN_HALF_WIDTH + 'px';
+    pin.appendChild(pinImg);
+    fragmentForPins.appendChild(pin);
+  }
 
-  var pinImg = document.createElement('img');
-  pinImg.className = 'rounded';
-  pinImg.style.height = '40px';
-  pinImg.style.width = '40px';
-  pinImg.setAttribute('src', usersData[i].author.avatar);
+  pinMap.appendChild(fragmentForPins);
+};
 
-  pin.appendChild(pinImg);
-  fragmentForPins.appendChild(pin);
-}
-
-pinMap.appendChild(fragmentForPins);
+drawPins();
 
 var userInfoTemplate = document.querySelector('#lodge-template').content;
 var activeUserInfo = userInfoTemplate.cloneNode(true);
