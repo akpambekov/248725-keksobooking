@@ -2,19 +2,7 @@
 
 // начальные данные
 
-
 var usersNumber = 8;
-
-var getUserID = function (numb) {
-  var usersID = [];
-  for (var i = 1; i <= numb; i++) {
-    usersID.push('0' + i);
-  }
-  return usersID;
-};
-
-var usersID = getUserID(usersNumber);
-var usersQuantity = usersID.length;
 var titles = [
   'Большая уютная квартира',
   'Маленькая неуютная квартира',
@@ -49,32 +37,43 @@ var coordinatesForY = {
   'max': 500
 };
 var usersData = [];
+var buildingType = {
+  'flat': 'Квартира',
+  'bungalo': 'Бунгало',
+  'house': 'Дом'
+};
 
 // вспомогательные функции
+var getUserID = function (numb) {
+  return '0' + numb;
+};
 
-var randomSort = function () {
-  var result = Math.random() - 0.5;
-  if (result > 0) {
-    return 1;
-  } else if (result < 0) {
-    return -1;
-  } else {
-    return 0;
+var randomSort = function (arr) {
+  var currentIndex = arr.length;
+  var temporaryValue = null;
+  var randomIndex = null;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    temporaryValue = arr[currentIndex];
+    arr[currentIndex] = arr[randomIndex];
+    arr[randomIndex] = temporaryValue;
   }
+  return arr;
 };
 
 var getRandomValueInRange = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
 };
 
-var getUserAvatar = function (arr) {
-  var currentUser = arr.shift();
-  return 'img/avatars/user' + currentUser + '.png';
+var getUserAvatar = function (str) {
+  return 'img/avatars/user' + str + '.png';
 };
 
 var getUserTitle = function (arr) {
-  arr.sort(randomSort);
-  return arr.pop();
+  var a = randomSort(arr);
+  return a.pop();
 };
 
 var getRandomValueFromArray = function (arr) {
@@ -83,39 +82,21 @@ var getRandomValueFromArray = function (arr) {
 };
 
 var getArrayWithRandomLengthAndValues = function (arr) {
-  var arrayLength = getRandomValueInRange(0, arr.length);
-  var arrID = [];
-  var randomKeysForArr = [];
-  var result = [];
-  if (arrayLength === arr.length) {
-    return arr;
-  }
-
-  if (arrayLength === 0) {
-    return [];
-  }
+  var arrCopy = [];
   for (var i = 0; i < arr.length; i++) {
-    arrID[i] = i;
+    arrCopy[i] = arr[i];
   }
-
-  arrID.sort(randomSort);
-  for (i = 0; i < arrayLength; i++) {
-    randomKeysForArr.push(arrID.pop());
-  }
-  randomKeysForArr.sort();
-
-  for (i = 0; i < randomKeysForArr.length; i++) {
-    result.push(arr[randomKeysForArr[i]]);
-  }
-  return result;
+  randomSort(arrCopy);
+  var arrayLength = getRandomValueInRange(0, arr.length);
+  return arrCopy.splice(0, arrayLength);
 };
 
 // основная функция для получения пользовательских данных
 
-var getUserData = function () {
+var getUserData = function (number) {
   var data = {
     'author': {
-      'avatar': getUserAvatar(usersID)
+      'avatar': getUserAvatar(getUserID(number))
     },
 
     'offer': {
@@ -148,8 +129,8 @@ var drawPins = function () {
   var PIN_HEIGHT = 75;
   var PIN_HALF_WIDTH = 56 / 2;
 
-  for (var i = 0; i < usersQuantity; i++) {
-    usersData.push(getUserData());
+  for (var i = 0; i < usersNumber; i++) {
+    usersData.push(getUserData(i + 1));
 
     var pin = document.createElement('div');
     pin.className = 'pin';
@@ -168,30 +149,21 @@ var drawPins = function () {
 
   pinMap.appendChild(fragmentForPins);
 };
-
-drawPins();
-
-var userInfoTemplate = document.querySelector('#lodge-template').content;
-var activeUserInfo = userInfoTemplate.cloneNode(true);
-var activeUserTitle = activeUserInfo.querySelector('.lodge__title');
-var activeUserAddress = activeUserInfo.querySelector('.lodge__address');
-var activeUserPrice = activeUserInfo.querySelector('.lodge__price');
-var activeUserType = activeUserInfo.querySelector('.lodge__type');
-var activeUserGuests = activeUserInfo.querySelector('.lodge__rooms-and-guests');
-var activeUserCheckin = activeUserInfo.querySelector('.lodge__checkin-time');
-var activeUserFeatures = activeUserInfo.querySelector('.lodge__features');
-var activeUserAvatar = document.querySelector('.dialog__title img');
-var replacedElement = document.querySelector('.dialog__panel');
-var parentElement = document.querySelector('#offer-dialog');
-var fragmentForFeatures = document.createDocumentFragment();
-var activeUserDscr = activeUserInfo.querySelector('.lodge__description');
-var buildingType = {
-  'flat': 'Квартира',
-  'bungalo': 'Бунгало',
-  'house': 'Дом'
-};
-
-var setActivePinInfoOnPage = function (data) {
+var activePinFormationAndSet = function (data) {
+  var userInfoTemplate = document.querySelector('#lodge-template').content;
+  var activeUserInfo = userInfoTemplate.cloneNode(true);
+  var activeUserTitle = activeUserInfo.querySelector('.lodge__title');
+  var activeUserAddress = activeUserInfo.querySelector('.lodge__address');
+  var activeUserPrice = activeUserInfo.querySelector('.lodge__price');
+  var activeUserType = activeUserInfo.querySelector('.lodge__type');
+  var activeUserGuests = activeUserInfo.querySelector('.lodge__rooms-and-guests');
+  var activeUserCheckin = activeUserInfo.querySelector('.lodge__checkin-time');
+  var activeUserFeatures = activeUserInfo.querySelector('.lodge__features');
+  var activeUserAvatar = document.querySelector('.dialog__title img');
+  var replacedElement = document.querySelector('.dialog__panel');
+  var parentElement = document.querySelector('#offer-dialog');
+  var fragmentForFeatures = document.createDocumentFragment();
+  var activeUserDscr = activeUserInfo.querySelector('.lodge__description');
   activeUserTitle.textContent = data.offer.title;
   activeUserAddress.textContent = data.offer.address;
   activeUserPrice.textContent = data.offer.price + ' \u20BD/ночь';
@@ -211,4 +183,5 @@ var setActivePinInfoOnPage = function (data) {
   parentElement.replaceChild(activeUserInfo, replacedElement);
 };
 
-setActivePinInfoOnPage(usersData[0]);
+drawPins();
+activePinFormationAndSet(usersData[0]);
