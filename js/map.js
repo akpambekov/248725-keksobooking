@@ -185,3 +185,74 @@ var activePinFormationAndSet = function (data) {
 
 drawPins();
 activePinFormationAndSet(usersData[0]);
+
+// навешивание событий для пинов
+
+/* не знаю, правильно ли сделал, но здесь я нашел все пины без главного,
+   поскольку в usersData всего 8 элементов, а поиск по пинам возращает 9,
+   в будущем это значение, вероятно, будет ненужным
+*/
+var getPinsArrWithoutMainPin = function () {
+  var pins = document.querySelectorAll('.pin');
+  var pinsArrWithoutMainPin = [];
+  for (var i = 0; i < pins.length; i++) {
+    if (!(pins[i].classList.contains('pin__main'))) {
+      pinsArrWithoutMainPin.push(pins[i]);
+    }
+  }
+  return pinsArrWithoutMainPin;
+};
+
+var closeButton = document.querySelector('.dialog__close');
+var dialog = document.querySelector('.dialog');
+var activePin = null;
+var TAB_INDEX_VALUE = '0';
+
+var onPinFocus = function (a, elem) {
+  //
+  elem.addEventListener('keydown', function (e) {
+    if (e.keyCode === 13) {
+      dialog.classList.remove('hidden');
+      activePinFormationAndSet(usersData[a]);
+    }
+  });
+};
+var onPinClick = function (x) {
+  return function (e) {
+    activePinFormationAndSet(usersData[x]);
+    dialog.classList.remove('hidden');
+    if (activePin) {
+      activePin.classList.remove('pin--active');
+    }
+    activePin = e.currentTarget;
+    activePin.classList.add('pin--active');
+  };
+};
+var onDocumentPressEsc = function (e) {
+  if (e.keyCode === 27) {
+    if (activePin) {
+      activePin.classList.remove('pin--active');
+    }
+    dialog.classList.add('hidden');
+  }
+};
+var addEventsForMultipleElems = function (elems) {
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].setAttribute('tabindex', TAB_INDEX_VALUE);
+    elems[i].addEventListener('click', onPinClick(i));
+    elems[i].addEventListener('focus', onPinFocus(i, elems[i]));
+  }
+};
+var onCloseButtonClick = function () {
+  if (activePin) {
+    activePin.classList.remove('pin--active');
+  }
+  dialog.classList.add('hidden');
+};
+var addEventsOnPage = function () {
+  addEventsForMultipleElems(getPinsArrWithoutMainPin());
+  document.addEventListener('keydown', onDocumentPressEsc);
+  closeButton.addEventListener('click', onCloseButtonClick);
+};
+
+addEventsOnPage();
