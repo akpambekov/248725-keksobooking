@@ -1,5 +1,9 @@
 'use strict';
 
+var PIN_HEIGHT = 75;
+var PIN_HALF_WIDTH = 56 / 2;
+var TAB_INDEX_VALUE = '0';
+
 // начальные данные
 
 var usersNumber = 8;
@@ -126,8 +130,6 @@ var getUserData = function (number) {
 var drawPins = function () {
   var fragmentForPins = document.createDocumentFragment();
   var pinMap = document.querySelector('.tokyo__pin-map');
-  var PIN_HEIGHT = 75;
-  var PIN_HALF_WIDTH = 56 / 2;
 
   for (var i = 0; i < usersNumber; i++) {
     usersData.push(getUserData(i + 1));
@@ -136,6 +138,7 @@ var drawPins = function () {
     pin.className = 'pin';
     pin.style.top = usersData[i].location.y - PIN_HEIGHT + 'px';
     pin.style.left = usersData[i].location.x - PIN_HALF_WIDTH + 'px';
+    pin.setAttribute('tabindex', TAB_INDEX_VALUE);
 
     var pinImg = document.createElement('img');
     pinImg.className = 'rounded';
@@ -149,7 +152,7 @@ var drawPins = function () {
 
   pinMap.appendChild(fragmentForPins);
 };
-var activePinFormationAndSet = function (data) {
+var createActivePinInfo = function (data) {
   var userInfoTemplate = document.querySelector('#lodge-template').content;
   var activeUserInfo = userInfoTemplate.cloneNode(true);
   var activeUserTitle = activeUserInfo.querySelector('.lodge__title');
@@ -184,4 +187,85 @@ var activePinFormationAndSet = function (data) {
 };
 
 drawPins();
-activePinFormationAndSet(usersData[0]);
+createActivePinInfo(usersData[0]);
+
+// навешивание событий для пинов
+
+var dialog = document.querySelector('.dialog');
+var closeButton = dialog.querySelector('.dialog__close');
+var activePin = null;
+
+var getPinsWithoutMainPin = function () {
+  var pins = document.querySelectorAll('.pin');
+  var resultPins = [];
+  for (var i = 0; i < pins.length; i++) {
+    if (!(pins[i].classList.contains('pin__main'))) {
+      resultPins.push(pins[i]);
+    }
+  }
+  return resultPins;
+};
+
+var isEscKeyCode = function (keyCode) {
+  return keyCode === 27;
+};
+
+var isEnterKeyCode = function (keyCode) {
+  return keyCode === 13;
+};
+
+var hideDialog = function () {
+  if (activePin) {
+    activePin.classList.remove('pin--active');
+  }
+  dialog.classList.add('hidden');
+};
+
+var onPinFocus = function (a, elem) {
+  elem.addEventListener('keydown', function (e) {
+    if (isEnterKeyCode(e.keyCode)) {
+      dialog.classList.remove('hidden');
+      createActivePinInfo(usersData[a]);
+    }
+  });
+};
+
+var onPinClick = function (x) {
+  return function (e) {
+    createActivePinInfo(usersData[x]);
+    dialog.classList.remove('hidden');
+    if (activePin) {
+      activePin.classList.remove('pin--active');
+    }
+    activePin = e.currentTarget;
+    activePin.classList.add('pin--active');
+  };
+};
+
+var onDocumentPressEsc = function (e) {
+  if (isEscKeyCode(e.keyCode)) {
+    hideDialog();
+  }
+};
+
+var addEventsForMultipleElems = function (elems) {
+  for (var i = 0; i < elems.length; i++) {
+    /* что - то я не смог тут ничего лучше придумать, если более лучшая идея есть,
+     то можно в один день как - нибудь связаться и разобрать.
+     */
+    elems[i].addEventListener('click', onPinClick(i));
+    elems[i].addEventListener('focus', onPinFocus(i, elems[i]));
+  }
+};
+
+var onCloseButtonClick = function () {
+  hideDialog();
+};
+
+var addEventsOnPage = function () {
+  addEventsForMultipleElems(getPinsWithoutMainPin());
+  document.addEventListener('keydown', onDocumentPressEsc);
+  closeButton.addEventListener('click', onCloseButtonClick);
+};
+
+addEventsOnPage();
