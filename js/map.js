@@ -250,9 +250,6 @@ var onDocumentPressEsc = function (e) {
 
 var addEventsForMultipleElems = function (elems) {
   for (var i = 0; i < elems.length; i++) {
-    /* что - то я не смог тут ничего лучше придумать, если более лучшая идея есть,
-     то можно в один день как - нибудь связаться и разобрать.
-     */
     elems[i].addEventListener('click', onPinClick(i));
     elems[i].addEventListener('focus', onPinFocus(i, elems[i]));
   }
@@ -269,3 +266,155 @@ var addEventsOnPage = function () {
 };
 
 addEventsOnPage();
+
+// валидация формы
+
+var mainForm = document.forms[1];
+var addressField = mainForm.elements.address;
+var titleField = mainForm.elements.title;
+var priceField = mainForm.elements.price;
+var typeField = mainForm.elements.type;
+var timeInField = mainForm.elements.timein;
+var timeOutField = mainForm.elements.timeout;
+var roomsField = mainForm.elements.rooms;
+var capacityField = mainForm.elements.capacity;
+var submitBtn = mainForm.querySelector('.form__submit');
+
+var mainFormAttr = {
+  'method': 'POST',
+  'action': 'https://1510.dump.academy/keksobooking',
+  'enctype': 'multipart/form-data'
+};
+var addressFieldAtrr = {
+  'required': 'true'
+};
+var titleFieldAtrr = {
+  'required': 'true',
+  'minlength': '30',
+  'maxlength': '100'
+};
+var priceFieldAtrr = {
+  'required': 'true',
+  'type': 'number',
+  'min': '0',
+  'max': '1000000',
+  'value': '1000'
+};
+var typePrice = {
+  'bungalo': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+var room = {
+  '0': [1],
+  '1': [2, 1],
+  '2': [3, 2, 1],
+  '3': [0]
+};
+
+var getFormElements = function () {
+  var formElements = [];
+  var inputs = mainForm.querySelectorAll('input');
+  var selects = mainForm.querySelectorAll('select');
+  for (var i = 0; i < inputs.length; i++) {
+    formElements.push(inputs[i]);
+  }
+  for (i = 0; i < selects.length; i++) {
+    formElements.push(selects[i]);
+  }
+  return formElements;
+};
+
+var formElements = getFormElements();
+
+var setAttrOnElem = function (elem, obj) {
+  for (var attrName in obj) {
+    if ({}.hasOwnProperty.call(obj, attrName)) {
+      elem.setAttribute(attrName, obj[attrName]);
+    }
+  }
+};
+
+var onTypeFieldChange = function () {
+  priceField.style.border = 'none';
+  priceField.setAttribute('min', '' + typePrice[typeField.value]);
+};
+
+var onTimeFieldChange = function (input) {
+  return function (e) {
+    input.value = e.target.value;
+  };
+};
+
+var undisableSelect = function (elem) {
+  elem.disabled = false;
+};
+
+var disableSelect = function (elem) {
+  elem.disabled = true;
+};
+
+var isElemOnArray = function (arr, elem) {
+  var searchingResult = arr.indexOf(elem);
+  return !(searchingResult === -1);
+};
+
+// Не уверен в корректности названии для функции
+var setDependenceForCapacityAndRoomsField = function () {
+  for (var guests in room) {
+    if (roomsField.options[guests].selected) {
+      for (var j = 0; j < capacityField.options.length; j++) {
+        if (isElemOnArray(room[guests], parseInt(capacityField.options[j].value, 10))) {
+          undisableSelect(capacityField.options[j]);
+        } else {
+          disableSelect(capacityField.options[j]);
+        }
+        if (room[guests][0] === parseInt(capacityField.options[j].value, 10)) {
+          capacityField.options[j].selected = true;
+        }
+      }
+    }
+  }
+};
+
+var validationCheck = function (e) {
+  var formIsNotValid = false;
+  for (var i = 0; i < formElements.length; i++) {
+    if (formElements[i].checkValidity() === false) {
+      formElements[i].style.border = '2px solid red';
+      formIsNotValid = true;
+    }
+  }
+  if (formIsNotValid) {
+    e.preventDefault();
+  }
+};
+
+var onFormElemBorderReset = function (e) {
+  e.target.style.border = 'none';
+};
+
+var onFormButtonSubmit = function () {
+  mainForm.reset();
+  setDependenceForCapacityAndRoomsField();
+};
+
+var setValidationOnMainForm = function () {
+  setDependenceForCapacityAndRoomsField();
+  setAttrOnElem(mainForm, mainFormAttr);
+  setAttrOnElem(addressField, addressFieldAtrr);
+  setAttrOnElem(titleField, titleFieldAtrr);
+  setAttrOnElem(priceField, priceFieldAtrr);
+  for (var i = 0; i < formElements.length; i++) {
+    formElements[i].addEventListener('change', onFormElemBorderReset);
+  }
+  typeField.addEventListener('change', onTypeFieldChange);
+  timeOutField.addEventListener('change', onTimeFieldChange(timeInField));
+  timeInField.addEventListener('change', onTimeFieldChange(timeOutField));
+  roomsField.addEventListener('change', setDependenceForCapacityAndRoomsField);
+  submitBtn.addEventListener('click', validationCheck);
+  submitBtn.addEventListener('submit', onFormButtonSubmit);
+};
+
+setValidationOnMainForm();
