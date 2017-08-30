@@ -270,8 +270,6 @@ addEventsOnPage();
 // валидация формы
 
 var mainForm = document.forms[1];
-var addressField = mainForm.elements.address;
-var titleField = mainForm.elements.title;
 var priceField = mainForm.elements.price;
 var typeField = mainForm.elements.type;
 var timeInField = mainForm.elements.timein;
@@ -280,32 +278,14 @@ var roomsField = mainForm.elements.rooms;
 var capacityField = mainForm.elements.capacity;
 var submitBtn = mainForm.querySelector('.form__submit');
 
-var mainFormAttr = {
-  'method': 'POST',
-  'action': 'https://1510.dump.academy/keksobooking',
-  'enctype': 'multipart/form-data'
-};
-var addressFieldAtrr = {
-  'required': 'true'
-};
-var titleFieldAtrr = {
-  'required': 'true',
-  'minlength': '30',
-  'maxlength': '100'
-};
-var priceFieldAtrr = {
-  'required': 'true',
-  'type': 'number',
-  'min': '0',
-  'max': '1000000',
-  'value': '1000'
-};
 var typePrice = {
   'bungalo': 0,
   'flat': 1000,
   'house': 5000,
   'palace': 10000
 };
+
+// значения поля 'Кол-во комнат' связанные со значением поля 'Количество мест'
 var room = {
   '0': [1],
   '1': [2, 1],
@@ -327,14 +307,6 @@ var getFormElements = function () {
 };
 
 var formElements = getFormElements();
-
-var setAttrOnElem = function (elem, obj) {
-  for (var attrName in obj) {
-    if ({}.hasOwnProperty.call(obj, attrName)) {
-      elem.setAttribute(attrName, obj[attrName]);
-    }
-  }
-};
 
 var onTypeFieldChange = function () {
   priceField.style.border = 'none';
@@ -401,11 +373,10 @@ var onFormButtonSubmit = function () {
 };
 
 var setValidationOnMainForm = function () {
+  /* установил значение по умолч 'лачуга', потому что пред значен 'квартира' требует мин - 1000 (пункт 2 в задании),
+   что противоречит пункту 1, где мин - 0 для всего поля */
+  typeField.value = 'bungalo';
   setDependenceForCapacityAndRoomsField();
-  setAttrOnElem(mainForm, mainFormAttr);
-  setAttrOnElem(addressField, addressFieldAtrr);
-  setAttrOnElem(titleField, titleFieldAtrr);
-  setAttrOnElem(priceField, priceFieldAtrr);
   for (var i = 0; i < formElements.length; i++) {
     formElements[i].addEventListener('change', onFormElemBorderReset);
   }
