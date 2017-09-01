@@ -269,7 +269,8 @@ addEventsOnPage();
 
 // валидация формы
 
-var mainForm = document.forms[1];
+var mainForm = document.querySelector('.notice__form');
+var formElements = mainForm.querySelectorAll('input, select');
 var priceField = mainForm.elements.price;
 var typeField = mainForm.elements.type;
 var timeInField = mainForm.elements.timein;
@@ -278,48 +279,32 @@ var roomsField = mainForm.elements.rooms;
 var capacityField = mainForm.elements.capacity;
 var submitBtn = mainForm.querySelector('.form__submit');
 
-var typePrice = {
+var typesAndPricesRatio = {
   'bungalo': 0,
   'flat': 1000,
   'house': 5000,
   'palace': 10000
 };
 
-// значения поля 'Кол-во комнат' связанные со значением поля 'Количество мест'
-var room = {
-  '0': [1],
-  '1': [2, 1],
-  '2': [3, 2, 1],
-  '3': [0]
+var roomsAndGuestsRatio = {
+  '1': [1],
+  '2': [2, 1],
+  '3': [3, 2, 1],
+  '100': [0]
 };
-
-var getFormElements = function () {
-  var formElements = [];
-  var inputs = mainForm.querySelectorAll('input');
-  var selects = mainForm.querySelectorAll('select');
-  for (var i = 0; i < inputs.length; i++) {
-    formElements.push(inputs[i]);
-  }
-  for (i = 0; i < selects.length; i++) {
-    formElements.push(selects[i]);
-  }
-  return formElements;
-};
-
-var formElements = getFormElements();
 
 var onTypeFieldChange = function () {
   priceField.style.border = 'none';
-  priceField.setAttribute('min', '' + typePrice[typeField.value]);
+  priceField.setAttribute('min', typesAndPricesRatio[typeField.value]);
 };
 
-var onTimeFieldChange = function (input) {
-  return function (e) {
-    input.value = e.target.value;
-  };
+var syncValues = function (field1, field2) {
+  field1.addEventListener('change', function () {
+    field2.value = field1.value;
+  });
 };
 
-var undisableSelect = function (elem) {
+var enableSelect = function (elem) {
   elem.disabled = false;
 };
 
@@ -328,37 +313,53 @@ var disableSelect = function (elem) {
 };
 
 var isElemOnArray = function (arr, elem) {
-  var searchingResult = arr.indexOf(elem);
-  return !(searchingResult === -1);
+  return arr.indexOf(elem) !== -1;
 };
 
-// Не уверен в корректности названии для функции
-var setDependenceForCapacityAndRoomsField = function () {
-  for (var guests in room) {
-    if (roomsField.options[guests].selected) {
-      for (var j = 0; j < capacityField.options.length; j++) {
-        if (isElemOnArray(room[guests], parseInt(capacityField.options[j].value, 10))) {
-          undisableSelect(capacityField.options[j]);
-        } else {
-          disableSelect(capacityField.options[j]);
-        }
-        if (room[guests][0] === parseInt(capacityField.options[j].value, 10)) {
-          capacityField.options[j].selected = true;
-        }
-      }
+var getRoomsFieldSelectedValue = function () {
+  var rooms = roomsField.options;
+  var selectedValue = null;
+  for (var i = 0; i < rooms.length; i++) {
+    if (rooms[i].selected) {
+      selectedValue = rooms[i].value;
     }
   }
+  return selectedValue;
+};
+
+/* Я не очень понял, как можно избавиться от объекта с соотношением гостей - комнат и заменить все это функцией,
+ была идея с конструкцией switch и строгой привязкой к атрибуту name у опции, но мне кажется это плохая идея.
+ На этот счет можно бы устроить консультацию.
+ По функции, постарался ее сократить и сделать более читаемой
+ */
+var setDependenceForFields = function (arr, obj, key) {
+  for (var j = 0; j < arr.length; j++) {
+    var elemValue = parseInt(arr[j].value, 10);
+    var guests = obj[key];
+    if (isElemOnArray(guests, elemValue)) {
+      enableSelect(arr[j]);
+    } else {
+      disableSelect(arr[j]);
+    }
+    if (elemValue === guests[0]) {
+      arr[j].selected = true;
+    }
+  }
+};
+
+var onRoomsFieldChange = function () {
+  setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
 };
 
 var validationCheck = function (e) {
-  var formIsNotValid = false;
+  var formIsValid = true;
   for (var i = 0; i < formElements.length; i++) {
     if (formElements[i].checkValidity() === false) {
       formElements[i].style.border = '2px solid red';
-      formIsNotValid = true;
+      formIsValid = false;
     }
   }
-  if (formIsNotValid) {
+  if (!formIsValid) {
     e.preventDefault();
   }
 };
@@ -369,21 +370,19 @@ var onFormElemBorderReset = function (e) {
 
 var onFormButtonSubmit = function () {
   mainForm.reset();
-  setDependenceForCapacityAndRoomsField();
+  setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
 };
 
 var setValidationOnMainForm = function () {
-  /* установил значение по умолч 'лачуга', потому что пред значен 'квартира' требует мин - 1000 (пункт 2 в задании),
-   что противоречит пункту 1, где мин - 0 для всего поля */
   typeField.value = 'bungalo';
-  setDependenceForCapacityAndRoomsField();
+  setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
   for (var i = 0; i < formElements.length; i++) {
-    formElements[i].addEventListener('change', onFormElemBorderReset);
+    formElements[i].addEventListener('focus', onFormElemBorderReset);
   }
+  syncValues(timeInField, timeOutField);
+  syncValues(timeOutField, timeInField);
   typeField.addEventListener('change', onTypeFieldChange);
-  timeOutField.addEventListener('change', onTimeFieldChange(timeInField));
-  timeInField.addEventListener('change', onTimeFieldChange(timeOutField));
-  roomsField.addEventListener('change', setDependenceForCapacityAndRoomsField);
+  roomsField.addEventListener('change', onRoomsFieldChange);
   submitBtn.addEventListener('click', validationCheck);
   submitBtn.addEventListener('submit', onFormButtonSubmit);
 };
