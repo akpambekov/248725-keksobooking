@@ -107,7 +107,11 @@
     return data;
   };
 
-  for (var i = 0; i < window.USERS_NUMBER; i++) {
-    window.usersData.push(getUserData(i + 1));
-  }
+  var createUsersData = function () {
+    for (var i = 0; i < window.USERS_NUMBER; i++) {
+      window.usersData.push(getUserData(i + 1));
+    }
+  };
+
+  createUsersData();
 })();
