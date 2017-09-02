@@ -327,22 +327,17 @@ var getRoomsFieldSelectedValue = function () {
   return selectedValue;
 };
 
-/* Я не очень понял, как можно избавиться от объекта с соотношением гостей - комнат и заменить все это функцией,
- была идея с конструкцией switch и строгой привязкой к атрибуту name у опции, но мне кажется это плохая идея.
- На этот счет можно бы устроить консультацию.
- По функции, постарался ее сократить и сделать более читаемой
- */
-var setDependenceForFields = function (arr, obj, key) {
-  for (var j = 0; j < arr.length; j++) {
-    var elemValue = parseInt(arr[j].value, 10);
-    var guests = obj[key];
+var setDependenceForFields = function (arr, ratio, key) {
+  for (var i = 0; i < arr.length; i++) {
+    var elemValue = parseInt(arr[i].value, 10);
+    var guests = ratio[key];
     if (isElemOnArray(guests, elemValue)) {
-      enableSelect(arr[j]);
+      enableSelect(arr[i]);
     } else {
-      disableSelect(arr[j]);
+      disableSelect(arr[i]);
     }
     if (elemValue === guests[0]) {
-      arr[j].selected = true;
+      arr[i].selected = true;
     }
   }
 };
