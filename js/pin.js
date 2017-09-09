@@ -33,6 +33,7 @@
   var dialog = document.querySelector('.dialog');
   var closeButton = dialog.querySelector('.dialog__close');
   var activePin = null;
+
   var getPinsWithoutMainPin = function () {
     var pins = document.querySelectorAll('.pin');
     var resultPins = [];
@@ -43,6 +44,7 @@
     }
     return resultPins;
   };
+
   var hideDialog = function () {
     if (activePin) {
       activePin.classList.remove('pin--active');

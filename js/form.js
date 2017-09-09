@@ -2,6 +2,7 @@
 
 (function () {
   var mainForm = document.querySelector('.notice__form');
+  var address = document.querySelector('#address');
   var formElements = mainForm.querySelectorAll('input, select');
   var priceField = mainForm.elements.price;
   var typeField = mainForm.elements.type;
@@ -23,6 +24,10 @@
     '2': [2, 1],
     '3': [3, 2, 1],
     '100': [0]
+  };
+
+  window.setAddressValue = function (x, y) {
+    address.value = x + ' , ' + y;
   };
 
   var onTypeFieldChange = function () {

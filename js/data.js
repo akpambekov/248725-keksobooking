@@ -37,9 +37,11 @@
     'min': 100,
     'max': 500
   };
+
   var getUserID = function (numb) {
     return '0' + numb;
   };
+
   var randomSort = function (arr) {
     var currentIndex = arr.length;
     var temporaryValue = null;
@@ -54,20 +56,25 @@
     }
     return arr;
   };
+
   var getRandomValueInRange = function (min, max) {
     return Math.round(Math.random() * (max - min) + min);
   };
+
   var getUserAvatar = function (str) {
     return 'img/avatars/user' + str + '.png';
   };
+
   var getUserTitle = function (arr) {
     var a = randomSort(arr);
     return a.pop();
   };
+
   var getRandomValueFromArray = function (arr) {
     var randomValue = getRandomValueInRange(0, arr.length - 1);
     return arr[randomValue];
   };
+
   var getArrayWithRandomLengthAndValues = function (arr) {
     var arrCopy = [];
     for (var i = 0; i < arr.length; i++) {
@@ -77,6 +84,7 @@
     var arrayLength = getRandomValueInRange(0, arr.length);
     return arrCopy.splice(0, arrayLength);
   };
+
   var getUserData = function (number) {
     var data = {
       'author': {
