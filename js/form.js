@@ -26,8 +26,8 @@
     '100': [0]
   };
 
-  window.setAddressValue = function (xValue, yValue) {
-    address.value = xValue + ' , ' + yValue;
+  window.setAddressValue = function (x, y) {
+    address.value = x + ' , ' + y;
   };
 
   var onTypeFieldChange = function () {
