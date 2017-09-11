@@ -11,8 +11,8 @@
   };
   window.mainPin = document.querySelector('.pin__main');
   var address = document.querySelector('#address');
-  var initialAddressesLeftValue = parseInt(getComputedStyle(window.mainPin).left, 10);
-  var initialAddressesTopValue = parseInt(getComputedStyle(window.mainPin).top, 10);
+  window.initialAddressesLeftValue = parseInt(getComputedStyle(window.mainPin).left, 10);
+  window.initialAddressesTopValue = parseInt(getComputedStyle(window.mainPin).top, 10);
 
   var onAddressFieldChange = function () {
     var arr = address.value.split(' ');

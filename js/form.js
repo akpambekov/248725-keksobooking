@@ -12,6 +12,7 @@
   var roomsField = mainForm.elements.rooms;
   var capacityField = mainForm.elements.capacity;
   var submitBtn = mainForm.querySelector('.form__submit');
+  var messageCloseBtn = document.querySelector('.message__close');
 
   var getValuesFromField = function (field) {
     var result = [];
@@ -106,9 +107,22 @@
     e.target.style.border = 'none';
   };
 
-  var onFormButtonSubmit = function () {
-    mainForm.reset();
-    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+  var onFormButtonSubmit = function (e) {
+    e.preventDefault();
+
+    var onLoad = function () {
+      window.showErrorMessage('Данные успешно отправлены');
+      mainForm.reset();
+      setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+      window.setAddressValue(window.initialAddressesLeftValue + window.MAIN_PIN_HALF_WIDTH, window.initialAddressesTopValue + window.MAIN_PIN_HEIGHT);
+    };
+
+    window.backend.save(new FormData(mainForm), onLoad, window.showErrorMessage);
+  };
+
+  var onMessageCloseButtonClick = function (e) {
+    e.preventDefault();
+    window.message.classList.add('hidden');
   };
 
   var setValidationOnMainForm = function () {
@@ -124,7 +138,8 @@
     window.synchronizeFields(typeField, priceField, typeFieldValues, PRICE_FIELD_VALUES, syncValueWithMin);
     roomsField.addEventListener('change', onRoomsFieldChange);
     submitBtn.addEventListener('click', validationCheck);
-    submitBtn.addEventListener('submit', onFormButtonSubmit);
+    mainForm.addEventListener('submit', onFormButtonSubmit);
+    messageCloseBtn.addEventListener('click', onMessageCloseButtonClick);
   };
 
   setValidationOnMainForm();
