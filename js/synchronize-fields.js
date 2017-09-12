@@ -1,16 +1,15 @@
 'use strict';
 
 (function () {
-  // Здесь долго думал, но ничего корректного придумать не смог и оставил числительное в названии аргументов
-  window.synchronizeFields = function (firstField, secondField, firstData, secondData, syncFunc) {
+  window.synchronizeFields = function (source, target, sourceData, targetData, syncFunc) {
     var selectedValue = null;
     var selectedIndex = null;
 
     if (typeof syncFunc === 'function') {
-      firstField.addEventListener('change', function () {
-        selectedValue = firstField.value;
-        selectedIndex = firstData.indexOf(selectedValue);
-        syncFunc(secondField, secondData[selectedIndex]);
+      source.addEventListener('change', function () {
+        selectedValue = source.value;
+        selectedIndex = sourceData.indexOf(selectedValue);
+        syncFunc(target, targetData[selectedIndex]);
       });
     }
   };

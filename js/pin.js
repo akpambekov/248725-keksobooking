@@ -4,6 +4,7 @@
   var PIN_HEIGHT = 75;
   var PIN_HALF_WIDTH = 56 / 2;
   var TAB_INDEX_VALUE = '0';
+  var activePin = null;
 
   var drawPins = function (data) {
     var fragmentForPins = document.createDocumentFragment();
@@ -29,8 +30,8 @@
     pinMap.appendChild(fragmentForPins);
   };
 
-  window.dialog = document.querySelector('.dialog');
-  var closeButton = window.dialog.querySelector('.dialog__close');
+  var dialog = document.querySelector('.dialog');
+  var closeButton = dialog.querySelector('.dialog__close');
 
   var getPinsWithoutMainPin = function () {
     var pins = document.querySelectorAll('.pin');
@@ -47,13 +48,13 @@
     if (window.activePin) {
       window.activePin.classList.remove('pin--active');
     }
-    window.dialog.classList.add('hidden');
+    dialog.classList.add('hidden');
   };
 
   var onPinFocus = function (a, elem, data) {
     elem.addEventListener('keydown', function (e) {
       if (window.isEnterKeyCode(e.keyCode)) {
-        window.dialog.classList.remove('hidden');
+        dialog.classList.remove('hidden');
         window.createActivePinInfo(data[a]);
       }
     });
@@ -65,9 +66,21 @@
     }
   };
 
+  var showCard = function (data) {
+    return function (e) {
+      window.createActivePinInfo(data);
+      dialog.classList.remove('hidden');
+      if (activePin) {
+        activePin.classList.remove('pin--active');
+      }
+      activePin = e.currentTarget;
+      activePin.classList.add('pin--active');
+    };
+  };
+
   var addEventsForMultipleElems = function (elems, data) {
     for (var i = 0; i < elems.length; i++) {
-      elems[i].addEventListener('click', window.showCard(data[i]));
+      elems[i].addEventListener('click', showCard(data[i]));
       elems[i].addEventListener('focus', onPinFocus(i, elems[i], data));
     }
   };
@@ -85,5 +98,6 @@
   };
 
   window.backend.load(addEventsOnPage, window.showErrorMessage);
-
 })();
+
+

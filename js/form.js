@@ -14,7 +14,7 @@
   var submitBtn = mainForm.querySelector('.form__submit');
   var messageCloseBtn = document.querySelector('.message__close');
 
-  var getValuesFromField = function (field) {
+  var getValuesFromSelect = function (field) {
     var result = [];
 
     for (var i = 0; i < field.options.length; i++) {
@@ -24,9 +24,9 @@
     return result;
   };
 
-  var timeInFieldValues = getValuesFromField(timeInField);
-  var timeOutFieldValues = getValuesFromField(timeOutField);
-  var typeFieldValues = getValuesFromField(typeField);
+  var timeInFieldValues = getValuesFromSelect(timeInField);
+  var timeOutFieldValues = getValuesFromSelect(timeOutField);
+  var typeFieldValues = getValuesFromSelect(typeField);
 
   var roomsAndGuestsRatio = {
     '1': [1],
@@ -39,7 +39,7 @@
     address.value = x + ' , ' + y;
   };
 
-  var syncValueWithMin = function (elem, value) {
+  var setMinAttr = function (elem, value) {
     elem.style.border = 'none';
     elem.setAttribute('min', value);
   };
@@ -114,7 +114,10 @@
       window.showErrorMessage('Данные успешно отправлены');
       mainForm.reset();
       setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
-      window.setAddressValue(window.initialAddressesLeftValue + window.MAIN_PIN_HALF_WIDTH, window.initialAddressesTopValue + window.MAIN_PIN_HEIGHT);
+      window.setAddressValue(window.mainPinPositionForAddressField.left, window.mainPinPositionForAddressField.top);
+
+      window.mainPin.style.left = window.defaultMainPinPosition.left + 'px';
+      window.mainPin.style.top = window.defaultMainPinPosition.top + 'px';
     };
 
     window.backend.save(new FormData(mainForm), onLoad, window.showErrorMessage);
@@ -135,7 +138,7 @@
 
     window.synchronizeFields(timeOutField, timeInField, timeOutFieldValues, timeInFieldValues, syncValues);
     window.synchronizeFields(timeInField, timeOutField, timeInFieldValues, timeOutFieldValues, syncValues);
-    window.synchronizeFields(typeField, priceField, typeFieldValues, PRICE_FIELD_VALUES, syncValueWithMin);
+    window.synchronizeFields(typeField, priceField, typeFieldValues, PRICE_FIELD_VALUES, setMinAttr);
     roomsField.addEventListener('change', onRoomsFieldChange);
     submitBtn.addEventListener('click', validationCheck);
     mainForm.addEventListener('submit', onFormButtonSubmit);

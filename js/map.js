@@ -10,9 +10,16 @@
     return keyCode === 13;
   };
   window.mainPin = document.querySelector('.pin__main');
+  var mainPinStyle = getComputedStyle(window.mainPin);
   var address = document.querySelector('#address');
-  window.initialAddressesLeftValue = parseInt(getComputedStyle(window.mainPin).left, 10);
-  window.initialAddressesTopValue = parseInt(getComputedStyle(window.mainPin).top, 10);
+  window.defaultMainPinPosition = {
+    left: parseInt(mainPinStyle.left, 10),
+    top: parseInt(mainPinStyle.top, 10)
+  };
+  window.mainPinPositionForAddressField = {
+    left: window.defaultMainPinPosition.left + window.MAIN_PIN_HALF_WIDTH,
+    top: window.defaultMainPinPosition.top + window.MAIN_PIN_HEIGHT
+  };
 
   var onAddressFieldChange = function () {
     var arr = address.value.split(' ');
@@ -26,14 +33,14 @@
     }
 
     if (result.length < 2) {
-      window.mainPin.style.left = initialAddressesLeftValue + 'px';
-      window.mainPin.style.top = initialAddressesTopValue + 'px';
+      window.mainPin.style.left = window.defaultMainPinPosition.left + 'px';
+      window.mainPin.style.top = window.defaultMainPinPosition.top + 'px';
     } else {
       window.mainPin.style.left = result[0] - window.MAIN_PIN_HALF_WIDTH + 'px';
       window.mainPin.style.top = result[1] - window.MAIN_PIN_HEIGHT + 'px';
     }
   };
 
-  window.setAddressValue(initialAddressesLeftValue + window.MAIN_PIN_HALF_WIDTH, initialAddressesTopValue + window.MAIN_PIN_HEIGHT);
+  window.setAddressValue(window.mainPinPositionForAddressField.left, window.mainPinPositionForAddressField.top);
   address.addEventListener('change', onAddressFieldChange);
 })();
