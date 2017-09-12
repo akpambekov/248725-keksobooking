@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var PRICE_FIELD_VALUES = [1000, 0, 5000, 10000];
   var mainForm = document.querySelector('.notice__form');
   var address = document.querySelector('#address');
   var formElements = mainForm.querySelectorAll('input, select');
@@ -11,13 +12,21 @@
   var roomsField = mainForm.elements.rooms;
   var capacityField = mainForm.elements.capacity;
   var submitBtn = mainForm.querySelector('.form__submit');
+  var messageCloseBtn = document.querySelector('.message__close');
 
-  var typesAndPricesRatio = {
-    'bungalo': 0,
-    'flat': 1000,
-    'house': 5000,
-    'palace': 10000
+  var getValuesFromSelect = function (field) {
+    var result = [];
+
+    for (var i = 0; i < field.options.length; i++) {
+      result.push(field.options[i].value);
+    }
+
+    return result;
   };
+
+  var timeInFieldValues = getValuesFromSelect(timeInField);
+  var timeOutFieldValues = getValuesFromSelect(timeOutField);
+  var typeFieldValues = getValuesFromSelect(typeField);
 
   var roomsAndGuestsRatio = {
     '1': [1],
@@ -30,15 +39,13 @@
     address.value = x + ' , ' + y;
   };
 
-  var onTypeFieldChange = function () {
-    priceField.style.border = 'none';
-    priceField.setAttribute('min', typesAndPricesRatio[typeField.value]);
+  var setMinAttr = function (elem, value) {
+    elem.style.border = 'none';
+    elem.setAttribute('min', value);
   };
 
-  var syncValues = function (field1, field2) {
-    field1.addEventListener('change', function () {
-      field2.value = field1.value;
-    });
+  var syncValues = function (element, value) {
+    element.value = value;
   };
 
   var enableSelect = function (elem) {
@@ -100,23 +107,42 @@
     e.target.style.border = 'none';
   };
 
-  var onFormButtonSubmit = function () {
-    mainForm.reset();
-    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+  var onFormButtonSubmit = function (e) {
+    e.preventDefault();
+
+    var onLoad = function () {
+      window.showErrorMessage('Данные успешно отправлены');
+      mainForm.reset();
+      setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+      window.setAddressValue(window.mainPinPositionForAddressField.left, window.mainPinPositionForAddressField.top);
+
+      window.mainPin.style.left = window.defaultMainPinPosition.left + 'px';
+      window.mainPin.style.top = window.defaultMainPinPosition.top + 'px';
+    };
+
+    window.backend.save(new FormData(mainForm), onLoad, window.showErrorMessage);
+  };
+
+  var onMessageCloseButtonClick = function (e) {
+    e.preventDefault();
+    window.message.classList.add('hidden');
   };
 
   var setValidationOnMainForm = function () {
     typeField.value = 'bungalo';
     setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+
     for (var i = 0; i < formElements.length; i++) {
       formElements[i].addEventListener('focus', onFormElemBorderReset);
     }
-    syncValues(timeInField, timeOutField);
-    syncValues(timeOutField, timeInField);
-    typeField.addEventListener('change', onTypeFieldChange);
+
+    window.synchronizeFields(timeOutField, timeInField, timeOutFieldValues, timeInFieldValues, syncValues);
+    window.synchronizeFields(timeInField, timeOutField, timeInFieldValues, timeOutFieldValues, syncValues);
+    window.synchronizeFields(typeField, priceField, typeFieldValues, PRICE_FIELD_VALUES, setMinAttr);
     roomsField.addEventListener('change', onRoomsFieldChange);
     submitBtn.addEventListener('click', validationCheck);
-    submitBtn.addEventListener('submit', onFormButtonSubmit);
+    mainForm.addEventListener('submit', onFormButtonSubmit);
+    messageCloseBtn.addEventListener('click', onMessageCloseButtonClick);
   };
 
   setValidationOnMainForm();

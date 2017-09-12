@@ -4,22 +4,24 @@
   var PIN_HEIGHT = 75;
   var PIN_HALF_WIDTH = 56 / 2;
   var TAB_INDEX_VALUE = '0';
-  var drawPins = function () {
+  var activePin = null;
+
+  var drawPins = function (data) {
     var fragmentForPins = document.createDocumentFragment();
     var pinMap = document.querySelector('.tokyo__pin-map');
 
-    for (var i = 0; i < window.USERS_NUMBER; i++) {
+    for (var i = 0; i < data.length; i++) {
       var pin = document.createElement('div');
       pin.className = 'pin';
-      pin.style.top = window.usersData[i].location.y - PIN_HEIGHT + 'px';
-      pin.style.left = window.usersData[i].location.x - PIN_HALF_WIDTH + 'px';
+      pin.style.top = data[i].location.y - PIN_HEIGHT + 'px';
+      pin.style.left = data[i].location.x - PIN_HALF_WIDTH + 'px';
       pin.setAttribute('tabindex', TAB_INDEX_VALUE);
 
       var pinImg = document.createElement('img');
       pinImg.className = 'rounded';
       pinImg.style.height = '40px';
       pinImg.style.width = '40px';
-      pinImg.setAttribute('src', window.usersData[i].author.avatar);
+      pinImg.setAttribute('src', data[i].author.avatar);
 
       pin.appendChild(pinImg);
       fragmentForPins.appendChild(pin);
@@ -28,11 +30,8 @@
     pinMap.appendChild(fragmentForPins);
   };
 
-  drawPins();
-
   var dialog = document.querySelector('.dialog');
   var closeButton = dialog.querySelector('.dialog__close');
-  var activePin = null;
 
   var getPinsWithoutMainPin = function () {
     var pins = document.querySelectorAll('.pin');
@@ -46,24 +45,30 @@
   };
 
   var hideDialog = function () {
-    if (activePin) {
-      activePin.classList.remove('pin--active');
+    if (window.activePin) {
+      window.activePin.classList.remove('pin--active');
     }
     dialog.classList.add('hidden');
   };
 
-  var onPinFocus = function (a, elem) {
+  var onPinFocus = function (a, elem, data) {
     elem.addEventListener('keydown', function (e) {
       if (window.isEnterKeyCode(e.keyCode)) {
         dialog.classList.remove('hidden');
-        window.createActivePinInfo(window.usersData[a]);
+        window.createActivePinInfo(data[a]);
       }
     });
   };
 
-  var onPinClick = function (x) {
+  var onDocumentPressEsc = function (e) {
+    if (window.isEscKeyCode(e.keyCode)) {
+      hideDialog();
+    }
+  };
+
+  var showCard = function (data) {
     return function (e) {
-      window.createActivePinInfo(window.usersData[x]);
+      window.createActivePinInfo(data);
       dialog.classList.remove('hidden');
       if (activePin) {
         activePin.classList.remove('pin--active');
@@ -73,28 +78,26 @@
     };
   };
 
-  var onDocumentPressEsc = function (e) {
-    if (window.isEscKeyCode(e.keyCode)) {
-      hideDialog();
-    }
-  };
-
-  var addEventsForMultipleElems = function (elems) {
+  var addEventsForMultipleElems = function (elems, data) {
     for (var i = 0; i < elems.length; i++) {
-      elems[i].addEventListener('click', onPinClick(i));
-      elems[i].addEventListener('focus', onPinFocus(i, elems[i]));
+      elems[i].addEventListener('click', showCard(data[i]));
+      elems[i].addEventListener('focus', onPinFocus(i, elems[i], data));
     }
   };
 
-  var onCloseButtonClick = function () {
+  var onDialogCloseButtonClick = function () {
     hideDialog();
   };
 
-  var addEventsOnPage = function () {
-    addEventsForMultipleElems(getPinsWithoutMainPin());
+  var addEventsOnPage = function (data) {
+    window.createActivePinInfo(data[0]);
+    drawPins(data);
+    addEventsForMultipleElems(getPinsWithoutMainPin(), data);
     document.addEventListener('keydown', onDocumentPressEsc);
-    closeButton.addEventListener('click', onCloseButtonClick);
+    closeButton.addEventListener('click', onDialogCloseButtonClick);
   };
 
-  addEventsOnPage();
+  window.backend.load(addEventsOnPage, window.showErrorMessage);
 })();
+
+

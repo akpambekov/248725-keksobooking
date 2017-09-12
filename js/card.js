@@ -1,10 +1,15 @@
 'use strict';
 
 (function () {
+  var dialog = document.querySelector('#offer-dialog');
   var buildingType = {
     'flat': 'Квартира',
     'bungalo': 'Бунгало',
     'house': 'Дом'
+  };
+
+  var hideDialogOnDefault = function () {
+    dialog.classList.add('hidden');
   };
 
   window.createActivePinInfo = function (data) {
@@ -18,10 +23,12 @@
     var activeUserCheckin = activeUserInfo.querySelector('.lodge__checkin-time');
     var activeUserFeatures = activeUserInfo.querySelector('.lodge__features');
     var activeUserAvatar = document.querySelector('.dialog__title img');
-    var replacedElement = document.querySelector('.dialog__panel');
-    var parentElement = document.querySelector('#offer-dialog');
+    var dialogPanel = document.querySelector('.dialog__panel');
     var fragmentForFeatures = document.createDocumentFragment();
+    var fragmentForPhotos = document.createDocumentFragment();
     var activeUserDscr = activeUserInfo.querySelector('.lodge__description');
+    var activeUserPhotos = activeUserInfo.querySelector('.lodge__photos');
+
     activeUserTitle.textContent = data.offer.title;
     activeUserAddress.textContent = data.offer.address;
     activeUserPrice.textContent = data.offer.price + ' \u20BD/ночь';
@@ -35,11 +42,20 @@
       fragmentForFeatures.appendChild(feature);
     }
 
+    for (var imgCount = 0; imgCount < data.offer.photos.length; imgCount++) {
+      var photo = document.createElement('img');
+      photo.src = data.offer.photos[imgCount];
+      photo.style.width = '52px';
+      photo.style.height = '42px';
+      fragmentForPhotos.appendChild(photo);
+    }
+
     activeUserFeatures.appendChild(fragmentForFeatures);
+    activeUserPhotos.appendChild(fragmentForPhotos);
     activeUserDscr.textContent = data.offer.description;
     activeUserAvatar.setAttribute('src', data.author.avatar);
-    parentElement.replaceChild(activeUserInfo, replacedElement);
+    dialog.replaceChild(activeUserInfo, dialogPanel);
   };
 
-  window.createActivePinInfo(window.usersData[0]);
+  hideDialogOnDefault();
 })();

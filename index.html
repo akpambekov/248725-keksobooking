@@ -241,12 +241,17 @@
               <div class="form__photo"></div>
               <div class="form__photo"></div>
             </div>
-
           </div>
         </div>
       </div>
       <button class="form__submit" type="submit">Опубликовать</button>
     </form>
+  </div>
+  <div class="message hidden">
+    <a href="#" class="message__close">
+      <img src="img/close.svg" alt="close" width="22" height="22">
+    </a>
+    <p class="message__text"></p>
   </div>
 </main>
 <footer class="footer container">
@@ -279,7 +284,10 @@
   </div>
 </template>
 
+<script src="js/backend.js"></script>
+<script src="js/message.js"></script>
 <script src="js/data.js"></script>
+<script src="js/synchronize-fields.js"></script>
 <script src="js/form.js"></script>
 <script src="js/map.js"></script>
 <script src="js/card.js"></script>
