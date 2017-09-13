@@ -12,5 +12,5 @@
         syncFunc(target, targetData[selectedIndex]);
       });
     }
-  };
+  }
 }());
