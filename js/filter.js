@@ -45,4 +45,4 @@
 
     return inputs.every(findCompliance);
   };
-}) ();
+})();
