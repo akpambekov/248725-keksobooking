@@ -13,21 +13,21 @@
   };
 
   var appendFeatures = function (features, HTMLfragment) {
-    for (var count = 0; count < features.length; count++) {
+    features.forEach(function (item) {
       var feature = document.createElement('span');
-      feature.className = 'feature__image feature__image--' + features[count];
+      feature.className = 'feature__image feature__image--' + item;
       HTMLfragment.appendChild(feature);
-    }
+    });
   };
 
   var appendPictures = function (photos, HTMLfragment) {
-    for (var imgCount = 0; imgCount < photos.length; imgCount++) {
+    photos.forEach(function (item) {
       var photo = document.createElement('img');
-      photo.src = photos[imgCount];
+      photo.src = item;
       photo.style.width = '52px';
       photo.style.height = '42px';
       HTMLfragment.appendChild(photo);
-    }
+    });
   };
 
   window.createActivePinInfo = function (data) {

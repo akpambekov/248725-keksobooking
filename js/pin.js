@@ -42,18 +42,18 @@
 
   var getThreeRandomArr = function (arr) {
     var indexes = [];
-    var randomArr = [];
+    var randomValues = [];
 
-    while (randomArr.length < 3) {
+    while (randomValues.length < 3) {
       var index = Math.floor(Math.random() * arr.length);
 
       if (indexes.indexOf(index) === -1) {
-        randomArr.push(arr[index]);
+        randomValues.push(arr[index]);
         indexes.push(index);
       }
     }
 
-    return randomArr;
+    return randomValues;
   };
 
   var getPinsWithoutMainPin = function () {

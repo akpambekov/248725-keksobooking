@@ -20,7 +20,7 @@
     return value >= PRICE_RANGE[range].MIN && value <= PRICE_RANGE[range].MAX;
   };
 
-  var isArrIncudeArr = function (source, target) {
+  var isPartOf = function (source, target) {
     return source.every(function (value) {
       return target.indexOf(value) !== -1;
     });
@@ -36,8 +36,8 @@
         return isPriceInRange(data[val], input[val].toUpperCase());
       } else if (typeof input[val] === 'string') {
         return input[val] === String(data[val]);
-      } else if (input[val] instanceof Array) {
-        return isArrIncudeArr(input[val], data[val]);
+      } else if (Array.isArray(input[val])) {
+        return isPartOf(input[val], data[val]);
       }
 
       return false;
