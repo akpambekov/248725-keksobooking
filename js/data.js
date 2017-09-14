@@ -76,10 +76,7 @@
   };
 
   var getArrayWithRandomLengthAndValues = function (arr) {
-    var arrCopy = [];
-    for (var i = 0; i < arr.length; i++) {
-      arrCopy[i] = arr[i];
-    }
+    var arrCopy = arr.slice(0);
     randomSort(arrCopy);
     var arrayLength = getRandomValueInRange(0, arr.length);
     return arrCopy.splice(0, arrayLength);
