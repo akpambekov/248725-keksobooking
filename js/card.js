@@ -12,6 +12,24 @@
     dialog.classList.add('hidden');
   };
 
+  var appendFeatures = function (features, HTMLfragment) {
+    features.forEach(function (item) {
+      var feature = document.createElement('span');
+      feature.className = 'feature__image feature__image--' + item;
+      HTMLfragment.appendChild(feature);
+    });
+  };
+
+  var appendPictures = function (photos, HTMLfragment) {
+    photos.forEach(function (item) {
+      var photo = document.createElement('img');
+      photo.src = item;
+      photo.style.width = '52px';
+      photo.style.height = '42px';
+      HTMLfragment.appendChild(photo);
+    });
+  };
+
   window.createActivePinInfo = function (data) {
     var userInfoTemplate = document.querySelector('#lodge-template').content;
     var activeUserInfo = userInfoTemplate.cloneNode(true);
@@ -36,19 +54,8 @@
     activeUserGuests.textContent = 'Для ' + data.offer.guests + ' гостей в ' + data.offer.rooms + ' комнатах';
     activeUserCheckin.textContent = 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout;
 
-    for (var count = 0; count < data.offer.features.length; count++) {
-      var feature = document.createElement('span');
-      feature.className = 'feature__image feature__image--' + data.offer.features[count];
-      fragmentForFeatures.appendChild(feature);
-    }
-
-    for (var imgCount = 0; imgCount < data.offer.photos.length; imgCount++) {
-      var photo = document.createElement('img');
-      photo.src = data.offer.photos[imgCount];
-      photo.style.width = '52px';
-      photo.style.height = '42px';
-      fragmentForPhotos.appendChild(photo);
-    }
+    appendFeatures(data.offer.features, fragmentForFeatures);
+    appendPictures(data.offer.photos, fragmentForPhotos);
 
     activeUserFeatures.appendChild(fragmentForFeatures);
     activeUserPhotos.appendChild(fragmentForPhotos);

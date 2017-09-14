@@ -17,9 +17,9 @@
       return valueInRange;
     } else if (valueInRange > minLimit) {
       return maxLimit;
-    } else {
-      return minLimit;
     }
+
+    return minLimit;
   };
 
   var onMouseMove = function (event) {
