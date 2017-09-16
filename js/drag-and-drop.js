@@ -11,6 +11,7 @@
     x: null,
     y: null
   };
+  var address = document.querySelector('#address');
 
   var setLimitOnPinMoves = function (valueInRange, minLimit, maxLimit) {
     if (valueInRange > minLimit && valueInRange < maxLimit) {
@@ -46,8 +47,20 @@
     document.removeEventListener('mouseup', onMouseUp);
   };
 
+  var clearValidationErrorMsgOnAddressField = function () {
+    var errorMsg = address.nextSibling;
+
+    if (errorMsg) {
+      errorMsg.remove();
+    }
+
+    address.style.border = 'none';
+  };
+
   var onMainPinMouseDown = function (event) {
     event.preventDefault();
+    clearValidationErrorMsgOnAddressField();
+
     startCoords = {
       x: event.clientX,
       y: event.clientY

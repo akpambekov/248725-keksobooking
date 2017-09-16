@@ -40,6 +40,12 @@
   };
 
   var setMinAttr = function (elem, value) {
+    var errorMsg = priceField.nextSibling;
+
+    if (errorMsg) {
+      errorMsg.remove();
+    }
+
     elem.style.border = 'none';
     elem.setAttribute('min', value);
   };
@@ -60,26 +66,12 @@
     return arr.indexOf(elem) !== -1;
   };
 
-  var getRoomsFieldSelectedValue = function () {
-    var rooms = roomsField.options;
-    var selectedValue = null;
-    for (var i = 0; i < rooms.length; i++) {
-      if (rooms[i].selected) {
-        selectedValue = rooms[i].value;
-      }
-    }
-    return selectedValue;
-  };
-
   var setDependenceForFields = function (arr, ratio, key) {
     for (var i = 0; i < arr.length; i++) {
       var elemValue = parseInt(arr[i].value, 10);
       var guests = ratio[key];
-      if (isElemOnArray(guests, elemValue)) {
-        enableSelect(arr[i]);
-      } else {
-        disableSelect(arr[i]);
-      }
+
+      isElemOnArray(guests, elemValue) ? enableSelect(arr[i]) : disableSelect(arr[i]);
       if (elemValue === guests[0]) {
         arr[i].selected = true;
       }
@@ -87,15 +79,32 @@
   };
 
   var onRoomsFieldChange = function () {
-    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, roomsField.value);
+  };
+
+  var clearValidationErrorMessages = function () {
+    var errorMessage = document.querySelectorAll('.error-message');
+
+    for (var j = 0; j < errorMessage.length; j++) {
+      errorMessage[j].remove();
+    }
   };
 
   var validationCheck = function (e) {
     var formIsValid = true;
+    clearValidationErrorMessages();
+
     for (var i = 0; i < formElements.length; i++) {
       if (formElements[i].checkValidity() === false) {
         formElements[i].style.border = '2px solid red';
         formIsValid = false;
+
+        var inputCustomValidation = new window.CustomValidation();
+        inputCustomValidation.clearInvalidities();
+        inputCustomValidation.checkValid(formElements[i]);
+
+        var customValidityMessageForHTML = inputCustomValidation.getInvaliditiesForHTML();
+        formElements[i].insertAdjacentHTML('afterend', '<p class="error-message">' + customValidityMessageForHTML + '</p>');
       }
     }
     if (!formIsValid) {
@@ -105,6 +114,11 @@
 
   var onFormElemBorderReset = function (e) {
     e.target.style.border = 'none';
+    var errorMsg = e.target.nextSibling;
+
+    if (errorMsg) {
+      errorMsg.remove();
+    }
   };
 
   var onFormButtonSubmit = function (e) {
@@ -113,7 +127,7 @@
     var onLoad = function () {
       window.showErrorMessage('Данные успешно отправлены');
       mainForm.reset();
-      setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+      setDependenceForFields(capacityField.options, roomsAndGuestsRatio, roomsField.value);
       window.setAddressValue(window.mainPinPositionForAddressField.left, window.mainPinPositionForAddressField.top);
 
       window.mainPin.style.left = window.defaultMainPinPosition.left + 'px';
@@ -130,7 +144,7 @@
 
   var setValidationOnMainForm = function () {
     typeField.value = 'bungalo';
-    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, getRoomsFieldSelectedValue());
+    setDependenceForFields(capacityField.options, roomsAndGuestsRatio, roomsField.value);
 
     for (var i = 0; i < formElements.length; i++) {
       formElements[i].addEventListener('focus', onFormElemBorderReset);

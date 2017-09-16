@@ -685,3 +685,32 @@ select option:hover {
   top: -26px;
   right: 0px;
 }
+
+.error-message {
+  display: inline-block;
+  position: absolute;
+  top: -25px;
+  padding: 10px;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  background-color: #ff5635;
+  margin: 0;
+  z-index: 1;
+  left: 0;
+}
+
+.error-message:before {
+  content: '';
+  left: 13px;
+  bottom: -22px;
+  display: block;
+  border: 12px solid transparent;
+  border-top: 15px solid #ff5635;
+  position: absolute;
+}
+
+.form__element  {
+  position: relative;
+}
+
