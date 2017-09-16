@@ -112,7 +112,7 @@
     }
   };
 
-  var onFormElemBorderReset = function (e) {
+  var onFormClearValidationErrorMsg = function (e) {
     e.target.style.border = 'none';
     var errorMsg = e.target.nextSibling;
 
@@ -147,7 +147,7 @@
     setDependenceForFields(capacityField.options, roomsAndGuestsRatio, roomsField.value);
 
     for (var i = 0; i < formElements.length; i++) {
-      formElements[i].addEventListener('focus', onFormElemBorderReset);
+      formElements[i].addEventListener('focus', onFormClearValidationErrorMsg);
     }
 
     window.synchronizeFields(timeOutField, timeInField, timeOutFieldValues, timeInFieldValues, syncValues);
