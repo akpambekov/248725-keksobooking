@@ -48,9 +48,9 @@
   };
 
   var clearValidationErrorMsgOnAddressField = function () {
-    var errorMsg = address.nextSibling;
+    var errorMsg = address.nextElementSibling;
 
-    if (errorMsg) {
+    if (errorMsg && errorMsg.classList.contains('error-message')) {
       errorMsg.remove();
     }
 

@@ -40,9 +40,9 @@
   };
 
   var setMinAttr = function (elem, value) {
-    var errorMsg = priceField.nextSibling;
+    var errorMsg = priceField.nextElementSibling;
 
-    if (errorMsg) {
+    if (errorMsg && errorMsg.classList.contains('error-message')) {
       errorMsg.remove();
     }
 
@@ -71,7 +71,12 @@
       var elemValue = parseInt(arr[i].value, 10);
       var guests = ratio[key];
 
-      isElemOnArray(guests, elemValue) ? enableSelect(arr[i]) : disableSelect(arr[i]);
+      if (isElemOnArray(guests, elemValue)) {
+        enableSelect(arr[i]);
+      } else {
+        disableSelect(arr[i]);
+      }
+
       if (elemValue === guests[0]) {
         arr[i].selected = true;
       }
@@ -114,9 +119,9 @@
 
   var onFormClearValidationErrorMsg = function (e) {
     e.target.style.border = 'none';
-    var errorMsg = e.target.nextSibling;
+    var errorMsg = e.target.nextElementSibling;
 
-    if (errorMsg) {
+    if (errorMsg && errorMsg.classList.contains('error-message')) {
       errorMsg.remove();
     }
   };
