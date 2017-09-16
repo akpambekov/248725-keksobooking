@@ -71,6 +71,9 @@
       var elemValue = parseInt(arr[i].value, 10);
       var guests = ratio[key];
 
+      /* не могу здесь использовать тернарный оператор,
+      потому что ESLint начинает ругаться (требует присвоение выражения с тернарным оператором в переменную) */
+
       if (isElemOnArray(guests, elemValue)) {
         enableSelect(arr[i]);
       } else {
